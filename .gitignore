@@ -1,0 +1,5 @@
+*.swp
+src/*
+bin/*
+
+!bin/clipsenv

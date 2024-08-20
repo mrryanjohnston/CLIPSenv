@@ -1,5 +1,9 @@
 # CLIPSenv
 
+## Forward
+
+This software is meant for educational purposes only :) Be careful!
+
 ## Description
 
 A version manager for [CLIPS](https://www.clipsrules.net/) akin to rbenv, pyenv, and nvm.

@@ -179,7 +179,7 @@ do
 		elif [ "$REPLY" = "c" ]; then
 			display_clone_prompt
 		elif [ "$REPLY" = "g" ]; then
-			display_clone_prompt
+			display_global_prompt
 		else
 			echo "Option not recognized. Exit any time with (ctrl + c). Otherwise, let's continue..."
 		fi

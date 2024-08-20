@@ -60,7 +60,7 @@ display_global_prompt()
 	echo "$CURRENTLY_INSTALLED_BINARIES" | nl
 	read -p "Which?: " REPLY
 	CLIPS_VERSION="$(echo "$CURRENTLY_INSTALLED_BINARIES" | sed -n "$REPLY"p | xargs basename)"
-	ln -s "$CLIPS_BIN_DIR/clips" "$CLIPS_BIN_DIR/$CLIPS_VERSION/clips"
+	ln -sf  "$CLIPS_BIN_DIR/$CLIPS_VERSION/clips" "$CLIPS_BIN_DIR/clips"
 	echo "Done! Exit any time with (ctrl + c). Otherwise, let's continue..."
 }
 
@@ -163,9 +163,9 @@ do
 		fi
 	elif [ -z "$CURRENTLY_INSTALLED_BINARIES" ]; then
 		read -p "Do you want to (i)nstall or (c)lone a base as a new install? (i/c): " REPLY
-		if [ "$REPLY" -eq "i" ]; then
+		if [ "$REPLY" = "i" ]; then
 			display_installation_prompt
-		elif [ "$REPLY" -eq "c" ]; then
+		elif [ "$REPLY" = "c" ]; then
 			display_clone_prompt
 		else
 			echo "Option not recognized. Exit any time with (ctrl + c). Otherwise, let's continue..."

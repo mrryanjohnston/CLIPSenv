@@ -92,10 +92,11 @@ display_uninstallation_prompt()
 		return
 	fi
 	rm -rf "$CLIPS_VERSION_IN_AVAILABLE_BINARIES"
+	PREVIOUS_REPLY="$REPLY"
 	read -p "Uninstalled! Want to purge the source files, as well? (Y/n): " REPLY
 	if [ "$REPLY" = "Y" ] || [ "$REPLY" = "y" ] || [ "$REPLY" = "" ]; then
 		CURRENTLY_AVAILABLE_SOURCE="$(ls -rd "$CLIPS_SRC_DIR"/*/ 2> /dev/null)"
-		CLIPS_VERSION_IN_AVAILABLE_SOURCE=$(echo "$CURRENTLY_AVAILABLE_SOURCE" | sed -n "$REPLY"p)
+		CLIPS_VERSION_IN_AVAILABLE_SOURCE=$(echo "$CURRENTLY_AVAILABLE_SOURCE" | sed -n "$PREVIOUS_REPLY"p)
 		if [ -z "$CLIPS_VERSION_IN_AVAILABLE_SOURCE" ]; then
 			echo "Source directory wasn't there. Something is wrong. Exiting..."
 			exit
@@ -109,13 +110,36 @@ display_uninstallation_prompt()
 
 display_clone_prompt()
 {
-	CURRENTLY_AVAILABLE_SOURCE="$(ls -rd "$CLIPS_SRC_DIR/*/" 2> /dev/null)"
-	echo "$CLIPS_VERSIONS\n$CURRENTLY_AVAILABLE_SOURCE" | nl
-	read -p "Which?: " REPLY
-	CLIPS_VERSION_IN_AVAILABLE_SOURCE=$(echo "$CLIPS_AVAILABLE_SOURCE" | sed -n "$REPLY"p)
-	if [ -z "$CLIPS_VERSION_IN_AVAILABLE_SOURCE" ] && [ -n "$CLIPS_VERSION" ]; then
-		download_process "$CLIPS_VERSION"
+	read -p "What should we call the clone?: " REPLY
+	CLONE_NAME="$REPLY"
+	ALL_CLONE_TARGETS="$CLIPS_VERSIONS"
+	CURRENTLY_AVAILABLE_SOURCE="$(ls -rd "$CLIPS_SRC_DIR"/*/ 2> /dev/null)"
+	if [ -n "$CURRENTLY_AVAILABLE_SOURCE" ]; then
+		ALL_CLONE_TARGETS="$ALL_CLONE_TARGETS\n$CURRENTLY_AVAILABLE_SOURCE"
 	fi
+	echo "$ALL_CLONE_TARGETS" | nl
+	read -p "Which?: " REPLY
+	TARGET=$(echo "$ALL_CLONE_TARGETS" | sed -n "$REPLY"p)
+	TARGET_IN_AVAILABLE_SOURCE=$(echo "$CURRENTLY_AVAILABLE_SOURCE" | grep "^$TARGET$")
+	if [ -z "$TARGET" ]; then
+		echo "Clone target not found in available versions"
+		return
+	fi
+	if [ -z "$TARGET_IN_AVAILABLE_SOURCE" ]; then
+		download_process "$TARGET"
+		mv "$CLIPS_SRC_DIR/$TARGET" "$CLIPS_SRC_DIR/$CLONE_NAME"
+	else
+		cp -r "$TARGET" "$CLIPS_SRC_DIR/$CLONE_NAME"
+	fi
+	installation_process "$CLONE_NAME"
+	read -p "Cloned! Want to point the global clips command to this newly installed binary? (Y/n): " REPLY
+	if [ "$REPLY" = "Y" ] || [ "$REPLY" = "y" ] || [ "$REPLY" = "" ]; then
+		ln -sf "$CLIPS_BIN_DIR/$CLONE_NAME/clips" "$CLIPS_BIN_DIR/clips"
+		echo "Done!"
+	else
+		echo "Ok."
+	fi
+	echo "Use (ctrl + c) to exit anytime. Otherwise, let's continue..."
 }
 
 echo "   _____ _      _____ _____   _____                 "
@@ -155,7 +179,8 @@ do
 			fi
 			
 		fi
-	elif [ ! -L "$CLIPS_BIN_DIR/clips" ] && [ -n "$CURRENTLY_INSTALLED_BINARIES" ]; then
+	fi
+	if [ ! -L "$CLIPS_BIN_DIR/clips" ] && [ -n "$CURRENTLY_INSTALLED_BINARIES" ]; then
 		echo "$CLIPS_BIN_DIR/clips is not present, but there are installed binaries"
 		read -p "Want to make a link the global clips command to an installed binary on the system? (Y/n): " REPLY
 		if [ "$REPLY" = "Y" ] || [ "$REPLY" = "y" ] || [ "$REPLY" = "" ]; then

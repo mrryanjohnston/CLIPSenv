@@ -10,7 +10,8 @@ GIT_COMMAND_AVAILABLE=$(command -v git)
 CLIPS_VERSIONS="6.4.1
 6.40
 6.31
-CLIPSockets"
+CLIPSockets
+CLIPSraylib"
 
 installation_process()
 {
@@ -27,7 +28,14 @@ installation_process()
 download_process()
 {
 	CLIPS_VERSION="$1"
-	if [ "$CLIPS_VERSION" = "CLIPSockets" ]; then
+	if [ "$CLIPS_VERSION" = "CLIPSraylib" ]; then
+		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
+			git clone "https://github.com/mrryanjohnston/CLIPSraylib" "$CLIPS_SRC_DIR/CLIPSraylib"
+		else
+			echo "Need git to download CLIPSraylib source code. Exiting..."
+			exit
+		fi
+	elif [ "$CLIPS_VERSION" = "CLIPSockets" ]; then
 		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
 			git clone "https://github.com/mrryanjohnston/CLIPSockets" "$CLIPS_SRC_DIR/CLIPSockets"
 		else

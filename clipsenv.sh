@@ -7,7 +7,8 @@ CLIPS_COMMAND_AVAILABLE=$(command -v clips)
 CURL_COMMAND_AVAILABLE=$(command -v curl)
 GIT_COMMAND_AVAILABLE=$(command -v git)
 
-CLIPS_VERSIONS="6.4.1
+CLIPS_VERSIONS="6.4.2
+6.4.1
 6.40
 6.31
 CLIPSockets

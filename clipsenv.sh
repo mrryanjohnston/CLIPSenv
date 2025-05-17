@@ -73,6 +73,15 @@ display_global_prompt()
 	echo "Done! Exit any time with (ctrl + c). Otherwise, let's continue..."
 }
 
+display_list()
+{
+	echo "Current installed source:"
+	echo "$CURRENTLY_AVAILABLE_SOURCE" | nl
+	echo "Current installed binaries:"
+	echo "$CURRENTLY_INSTALLED_BINARIES" | nl
+	echo "Done! Exit any time with (ctrl + c). Otherwise, let's continue..."
+}
+
 display_installation_prompt()
 {
 	echo "$CLIPS_VERSIONS" | nl
@@ -205,13 +214,15 @@ do
 			echo "Option not recognized. Exit any time with (ctrl + c). Otherwise, let's continue..."
 		fi
 	elif [ -n "$CURRENTLY_INSTALLED_BINARIES" ]; then 
-		read -p "Do you want to (i)nstall, (u)ninstall, or (c)lone a base as a new install? Or set the (g)lobal CLIPS command? (i/u/c/g): " REPLY
+		read -p "Do you want to (i)nstall, (u)ninstall, or (c)lone a base as a new install? Or (l)ist current CLIPS installations? Or set the (g)lobal CLIPS command? (i/u/c/l/g): " REPLY
 		if [ "$REPLY" = "i" ]; then
 			display_installation_prompt
 		elif [ "$REPLY" = "u" ]; then
 			display_uninstallation_prompt
 		elif [ "$REPLY" = "c" ]; then
 			display_clone_prompt
+		elif [ "$REPLY" = "l" ]; then
+			display_list
 		elif [ "$REPLY" = "g" ]; then
 			display_global_prompt
 		else

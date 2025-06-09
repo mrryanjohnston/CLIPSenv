@@ -6,13 +6,16 @@ CLIPS_SRC_DIR="$CLIPS_ENV_DIR/src"
 CLIPS_COMMAND_AVAILABLE=$(command -v clips)
 CURL_COMMAND_AVAILABLE=$(command -v curl)
 GIT_COMMAND_AVAILABLE=$(command -v git)
+SVN_COMMAND_AVAILABLE=$(command -v svn)
 
 CLIPS_VERSIONS="6.4.2
 6.4.1
 6.40
 6.31
 CLIPSockets
-CLIPSraylib"
+CLIPSraylib
+svn64x
+svn70x"
 
 installation_process()
 {
@@ -29,7 +32,17 @@ installation_process()
 download_process()
 {
 	CLIPS_VERSION="$1"
-	if [ "$CLIPS_VERSION" = "CLIPSraylib" ]; then
+	if [ -n "$CLIPS_VERSION" ] && [ -d "$CLIPS_SRC_DIR/$CLIPS_VERSION" ]; then
+		echo "Source code for $CLIPS_VERSION already on system..."
+	elif [ "$(printf "%.3s" "$CLIPS_VERSION")" = "svn" ]; then
+		last3=${CLIPS_VERSION#${CLIPS_VERSION%???}}
+		if [ -n "$SVN_COMMAND_AVAILABLE" ]; then
+			svn checkout "https://svn.code.sf.net/p/clipsrules/code/branches/$last3/core" "$CLIPS_SRC_DIR/$CLIPS_VERSION"
+		else
+			echo "Need svn to checkout versions from subversion. Exiting..."
+			exit
+		fi
+	elif [ "$CLIPS_VERSION" = "CLIPSraylib" ]; then
 		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
 			git clone "https://github.com/mrryanjohnston/CLIPSraylib" "$CLIPS_SRC_DIR/CLIPSraylib"
 		else
@@ -43,8 +56,6 @@ download_process()
 			echo "Need git to download CLIPSockets source code. Exiting..."
 			exit
 		fi
-	elif [ -n "$CLIPS_VERSION" ] && [ -d "$CLIPS_SRC_DIR/$CLIPS_VERSION" ]; then
-		echo "Source code for $CLIPS_VERSION already on system..."
 	elif [ -n "$CLIPS_VERSION" ]; then
 		CLIPS_TAR_FILE="clips_core_source_$(echo "$CLIPS_VERSION" | tr -d '.').tar.gz"
 		CLIPS_SRC_URL="https://sourceforge.net/projects/clipsrules/files/CLIPS/$CLIPS_VERSION/$CLIPS_TAR_FILE"

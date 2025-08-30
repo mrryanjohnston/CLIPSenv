@@ -14,6 +14,7 @@ CLIPS_VERSIONS="6.4.2
 6.31
 CLIPSockets
 CLIPSraylib
+CLIPSX11
 svn64x
 svn70x"
 
@@ -25,7 +26,11 @@ installation_process()
 	else
 		make -C "$CLIPS_SRC_DIR/$1"
 		mkdir -p "$CLIPS_BIN_DIR/$1"
-		ln -sf "$CLIPS_SRC_DIR/$1/clips" "$CLIPS_BIN_DIR/$1/clips"
+		if [ -d "$CLIPS_SRC_DIR/$1/clips" ]; then
+			ln -sf "$CLIPS_SRC_DIR/$1/clips" "$CLIPS_BIN_DIR/$1/clips"
+		else
+			ln -sf "$CLIPS_SRC_DIR/$1/vendor/clips/clips" "$CLIPS_BIN_DIR/$1/clips"
+		fi
 	fi
 }
 
@@ -42,6 +47,13 @@ download_process()
 			echo "Need svn to checkout versions from subversion. Exiting..."
 			exit
 		fi
+	elif [ "$CLIPS_VERSION" = "CLIPSockets" ]; then
+		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
+			git clone "https://github.com/mrryanjohnston/CLIPSockets" "$CLIPS_SRC_DIR/CLIPSockets"
+		else
+			echo "Need git to download CLIPSockets source code. Exiting..."
+			exit
+		fi
 	elif [ "$CLIPS_VERSION" = "CLIPSraylib" ]; then
 		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
 			git clone "https://github.com/mrryanjohnston/CLIPSraylib" "$CLIPS_SRC_DIR/CLIPSraylib"
@@ -49,11 +61,11 @@ download_process()
 			echo "Need git to download CLIPSraylib source code. Exiting..."
 			exit
 		fi
-	elif [ "$CLIPS_VERSION" = "CLIPSockets" ]; then
+	elif [ "$CLIPS_VERSION" = "CLIPSX11" ]; then
 		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
-			git clone "https://github.com/mrryanjohnston/CLIPSockets" "$CLIPS_SRC_DIR/CLIPSockets"
+			git clone "https://github.com/mrryanjohnston/CLIPSX11" "$CLIPS_SRC_DIR/CLIPSX11"
 		else
-			echo "Need git to download CLIPSockets source code. Exiting..."
+			echo "Need git to download CLIPSX11 source code. Exiting..."
 			exit
 		fi
 	elif [ -n "$CLIPS_VERSION" ]; then
@@ -181,7 +193,7 @@ echo "CLIPSenv: A Version Manager for CLIPS"
 
 if [ "$CLIPS_COMMAND_AVAILABLE" ]; then
 	case "$CLIPS_COMMAND_AVAILABLE" in
-		"$CLIPS_BIN_DIR/"*) ;;
+		"$CLIPS_BIN_DIR/"*) echo "clips command found and is pointed to $(readlink -f $CLIPS_COMMAND_AVAILABLE)";;
 		*) echo "WARNING: clips command found, but it is not managed by CLIPSenv!";;
 	esac
 fi

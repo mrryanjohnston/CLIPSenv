@@ -14,6 +14,7 @@ CLIPS_VERSIONS="6.4.2
 6.31
 CLIPSockets
 CLIPSraylib
+CLIPSQLite
 CLIPSX11
 svn64x
 svn70x"
@@ -59,6 +60,13 @@ download_process()
 			git clone "https://github.com/mrryanjohnston/CLIPSraylib" "$CLIPS_SRC_DIR/CLIPSraylib"
 		else
 			echo "Need git to download CLIPSraylib source code. Exiting..."
+			exit
+		fi
+	elif [ "$CLIPS_VERSION" = "CLIPSQLite" ]; then
+		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
+			git clone "https://github.com/mrryanjohnston/CLIPSQLite" "$CLIPS_SRC_DIR/CLIPSQLite"
+		else
+			echo "Need git to download CLIPSQLite source code. Exiting..."
 			exit
 		fi
 	elif [ "$CLIPS_VERSION" = "CLIPSX11" ]; then

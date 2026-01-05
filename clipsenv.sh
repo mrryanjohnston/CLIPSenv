@@ -16,6 +16,7 @@ CLIPSockets
 CLIPSraylib
 CLIPSQLite
 CLIPSX11
+CLIPSmqueue
 svn64x
 svn70x"
 
@@ -27,7 +28,9 @@ installation_process()
 	else
 		make -C "$CLIPS_SRC_DIR/$1"
 		mkdir -p "$CLIPS_BIN_DIR/$1"
-		if [ -d "$CLIPS_SRC_DIR/$1/clips" ]; then
+		if [ -f "$CLIPS_SRC_DIR/$1/clips" ]; then
+			ln -sf "$CLIPS_SRC_DIR/$1/clips" "$CLIPS_BIN_DIR/$1/clips"
+		elif [ -d "$CLIPS_SRC_DIR/$1/clips" ]; then
 			ln -sf "$CLIPS_SRC_DIR/$1/clips" "$CLIPS_BIN_DIR/$1/clips"
 		else
 			ln -sf "$CLIPS_SRC_DIR/$1/vendor/clips/clips" "$CLIPS_BIN_DIR/$1/clips"
@@ -74,6 +77,13 @@ download_process()
 			git clone "https://github.com/mrryanjohnston/CLIPSX11" "$CLIPS_SRC_DIR/CLIPSX11"
 		else
 			echo "Need git to download CLIPSX11 source code. Exiting..."
+			exit
+		fi
+	elif [ "$CLIPS_VERSION" = "CLIPSmqueue" ]; then
+		if [ -n "$GIT_COMMAND_AVAILABLE" ]; then
+			git clone "https://github.com/mrryanjohnston/CLIPSmqueue" "$CLIPS_SRC_DIR/CLIPSmqueue"
+		else
+			echo "Need git to download CLIPSmqueue source code. Exiting..."
 			exit
 		fi
 	elif [ -n "$CLIPS_VERSION" ]; then
